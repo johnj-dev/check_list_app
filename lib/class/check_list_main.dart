@@ -1,9 +1,16 @@
 import 'package:check_list_app/class/check_list_details.dart';
+import 'package:hive/hive.dart';
 
+part 'check_list_main.g.dart';
+
+@HiveType(typeId: 0)
 class CheckListMain {
 
+  @HiveField(0)
   String title;
-  bool isArchived;
+  @HiveField(1)
+  bool isCompleted;
+  @HiveField(2)
   List<CheckListDetails> details;
 
   CheckListMain({ this.title });
@@ -13,7 +20,7 @@ class CheckListMain {
   }
 
   void updateArchived(bool) {
-    this.isArchived = bool;
+    this.isCompleted = bool;
   }
 
 }
