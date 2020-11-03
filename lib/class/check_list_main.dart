@@ -13,7 +13,7 @@ class CheckListMain {
   @HiveField(2)
   List<CheckListDetails> details;
 
-  CheckListMain({ this.title });
+  CheckListMain({ this.title, this.isCompleted });
 
   void getDetails() {
 // test

@@ -36,13 +36,10 @@ class _HomeState extends State<Home> {
               // TODO : Filter
               switch (value) {
                 case 'Incomplete':
-
                   break;
                 case 'Complete':
-
                   break;
               }
-
             },
             itemBuilder: (BuildContext context) {
               return ['All', 'Incomplete', 'Complete'].map((option) {
@@ -55,11 +52,12 @@ class _HomeState extends State<Home> {
           ),
         ],
       ),
-      body: WatchBoxBuilder(
-        box: mainBox,
-        builder: (context, mainBox) {
+      body: ValueListenableBuilder(
+        valueListenable: mainBox.listenable(),
+        builder: (context, mainBox, _) {
           return ListView.builder(
             itemCount: mainBox.length,
+            shrinkWrap: true,
             itemBuilder: (context, index) {
               final mainList = mainBox.getAt(index) as CheckListMain;
               return Padding(
@@ -72,11 +70,20 @@ class _HomeState extends State<Home> {
                       });
                     },
                     title: Text(mainList.title),
-                    trailing: IconButton(
-                      onPressed: () {
-                        mainBox.deleteAt(index);
-                      },
-                      icon: Icon(Icons.delete),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.check,
+                          color: mainList.isCompleted ? Colors.green : Colors.red
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            mainBox.deleteAt(index);
+                          },
+                          icon: Icon(Icons.delete),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -106,7 +113,7 @@ class _HomeState extends State<Home> {
                     SizedBox(height: 5.0,),
                     RaisedButton(
                       onPressed: () {
-                        final checkListMain = CheckListMain(title: titleCtrl.text);
+                        final checkListMain = CheckListMain(title: titleCtrl.text, isCompleted: false);
                         addNewList(checkListMain);
                         Navigator.pop(context);
                         Navigator.pushNamed(context, '/details', arguments: {
