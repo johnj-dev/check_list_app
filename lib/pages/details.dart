@@ -15,8 +15,25 @@ class _DetailsState extends State<Details> {
   Map data = {};
   final TextEditingController descriptionCtrl = TextEditingController();
   final mainBox = Hive.box(Constants.mainBox);
-  List<CheckListDetails> detailsList;
   int id = 0;
+
+
+
+  bool isAllDone(CheckListMain checkListMain) {
+    List<CheckListDetails> details = checkListMain.details;
+    for (int i = 0; i < details.length; i++){
+      if (details[i].isDone == false) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  void saveUpdates(CheckListMain checkListMain, int id) {
+    checkListMain.isCompleted = isAllDone(checkListMain);
+    mainBox.put(id, checkListMain);
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +42,7 @@ class _DetailsState extends State<Details> {
     CheckListMain checkListMain = data['checkListMain'];
     id = data['index'];
 
-    checkListMain.details = List<CheckListDetails>();
+    checkListMain.details = checkListMain.details != null ? checkListMain.details : List<CheckListDetails>();
 
     return Scaffold(
       appBar: AppBar(
@@ -39,22 +56,23 @@ class _DetailsState extends State<Details> {
             itemCount: checkListMain.details.length,
             shrinkWrap: true,
             itemBuilder: (context, index) {
-              final mainList = mainBox.getAt(id) as CheckListMain;
-              detailsList = mainList.details;
+
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 1.0, horizontal: 4.0),
                 child: Card(
                   child: ListTile(
                     onTap: () {
-
+                      checkListMain.details[index].isDone =
+                          checkListMain.details[index].isDone ? false : true;
+                      saveUpdates(checkListMain, id);
                     },
-                    title: Text(detailsList[index].description),
+                    title: Text(checkListMain.details[index].description),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
                             Icons.check,
-                            color: detailsList[index].isDone ? Colors.green : Colors.red
+                            color: checkListMain.details[index].isDone ? Colors.green : Colors.red
                         ),
                         IconButton(
                           onPressed: () {
@@ -91,14 +109,8 @@ class _DetailsState extends State<Details> {
                     SizedBox(height: 5.0,),
                     RaisedButton(
                       onPressed: () {
-                        try{
-                          checkListMain.details.add(CheckListDetails(description: descriptionCtrl.text, isDone: false));
-                          mainBox.putAt(id, checkListMain);
-                        } catch (e) {
-                          print(e.toString());
-                        }
-                        // checkListMain.details.add(CheckListDetails(description: descriptionCtrl.text, isDone: false));
-                        // mainBox.putAt(id, checkListMain);
+                        checkListMain.details.add(CheckListDetails(description: descriptionCtrl.text, isDone: false));
+                        saveUpdates(checkListMain, id);
                         Navigator.pop(context);
                       },
                       child: Text('Add'),

@@ -9,6 +9,8 @@ class Home extends StatefulWidget {
   _HomeState createState() => _HomeState();
 }
 
+enum FilterData {ALL, INCOMPLETE, COMPLETE}
+
 class _HomeState extends State<Home> {
 
   final TextEditingController titleCtrl = TextEditingController();
@@ -16,6 +18,8 @@ class _HomeState extends State<Home> {
   final mainBox = Hive.box(Constants.mainBox);
 
   List<int> keys = List<int>();
+
+  FilterData filter = FilterData.ALL;
 
   void addNewList(CheckListMain checkListMain){
     mainBox.add(checkListMain);
@@ -31,11 +35,18 @@ class _HomeState extends State<Home> {
           PopupMenuButton(
             onSelected: (value) {
               // TODO : Filter
-              switch (value) {
-                case 'Incomplete':
-                  break;
-                case 'Complete':
-                  break;
+              if (value.compareTo('All') == 0){
+                setState(() {
+                  filter = FilterData.ALL;
+                });
+              } else if (value.compareTo('Incomplete') == 0){
+                setState(() {
+                  filter = FilterData.INCOMPLETE;
+                });
+              } else {
+                setState(() {
+                  filter = FilterData.COMPLETE;
+                });
               }
             },
             itemBuilder: (BuildContext context) {
@@ -53,23 +64,33 @@ class _HomeState extends State<Home> {
         valueListenable: mainBox.listenable(),
         builder: (context, mainBox, _) {
 
-          keys = mainBox.keys.cast<int>().toList();
+          if ( filter == FilterData.ALL ) {
+            keys = mainBox.keys.cast<int>().toList();
+          } else if ( filter == FilterData.INCOMPLETE ) {
+            keys = mainBox.keys.cast<int>().where((key) => !mainBox.get(key).isCompleted).toList();
+          } else {
+            keys = mainBox.keys.cast<int>().where((key) => mainBox.get(key).isCompleted ? true : false).toList();
+            print('test');
+          }
 
           return ListView.builder(
-            itemCount: mainBox.length,
+            itemCount: keys.length,
             shrinkWrap: true,
             itemBuilder: (context, index) {
-              final mainList = mainBox.getAt(index) as CheckListMain;
+              final int key = keys[index];
+              CheckListMain mainList = mainBox.get(key);
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 1.0, horizontal: 4.0),
                 child: Card(
                   child: ListTile(
                     onTap: () {
+                      print(keys[index]);
                       Navigator.pushNamed(context, '/details', arguments: {
-                        'checkListMain': mainBox.getAt(index),
+                        'checkListMain': mainBox.get(keys[index]),
                         'index': keys[index]
                       });
                     },
+                    leading: Text(keys[index].toString()),
                     title: Text(mainList.title),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -80,7 +101,7 @@ class _HomeState extends State<Home> {
                         ),
                         IconButton(
                           onPressed: () {
-                            mainBox.deleteAt(index);
+                            mainBox.delete(index);
                             keys = mainBox.keys.cast<int>().toList();
                           },
                           icon: Icon(Icons.delete),
@@ -142,6 +163,7 @@ class _HomeState extends State<Home> {
 
   @override
   void dispose() {
+
     Hive.close();
     super.dispose();
   }
