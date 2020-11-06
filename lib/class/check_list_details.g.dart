@@ -1,37 +1,35 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'check_list_main.dart';
+part of 'check_list_details.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class CheckListMainAdapter extends TypeAdapter<CheckListMain> {
+class CheckListDetailsAdapter extends TypeAdapter<CheckListDetails> {
   @override
-  final int typeId = 0;
+  final int typeId = 1;
 
   @override
-  CheckListMain read(BinaryReader reader) {
+  CheckListDetails read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return CheckListMain(
-      title: fields[0] as String,
-      isCompleted: fields[1] as bool,
-    )..details = (fields[2] as List)?.cast<CheckListDetails>();
+    return CheckListDetails(
+      description: fields[0] as String,
+      isDone: fields[1] as bool,
+    );
   }
 
   @override
-  void write(BinaryWriter writer, CheckListMain obj) {
+  void write(BinaryWriter writer, CheckListDetails obj) {
     writer
-      ..writeByte(3)
-      ..writeByte(0)
-      ..write(obj.title)
-      ..writeByte(1)
-      ..write(obj.isCompleted)
       ..writeByte(2)
-      ..write(obj.details);
+      ..writeByte(0)
+      ..write(obj.description)
+      ..writeByte(1)
+      ..write(obj.isDone);
   }
 
   @override
@@ -40,7 +38,7 @@ class CheckListMainAdapter extends TypeAdapter<CheckListMain> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is CheckListMainAdapter &&
+      other is CheckListDetailsAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

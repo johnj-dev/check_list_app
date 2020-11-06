@@ -1,3 +1,4 @@
+import 'package:check_list_app/class/check_list_details.dart';
 import 'package:check_list_app/class/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:check_list_app/pages/home.dart';
@@ -11,6 +12,7 @@ void main() async{
   final document = await path_provider.getApplicationDocumentsDirectory();
   Hive.init(document.path);
   Hive.registerAdapter(CheckListMainAdapter());
+  Hive.registerAdapter(CheckListDetailsAdapter());
   final mainBox = await Hive.openBox(Constants.mainBox);
   runApp(MaterialApp(
     initialRoute: '/',

@@ -13,14 +13,11 @@ class _HomeState extends State<Home> {
 
   final TextEditingController titleCtrl = TextEditingController();
 
-  List<CheckListMain> main = [
-    CheckListMain(title: 'CheckList 1'),
-    CheckListMain(title: 'CheckList 2'),
-    CheckListMain(title: 'CheckList 3'),
-  ];
   final mainBox = Hive.box(Constants.mainBox);
 
-  void addNewList(CheckListMain checkListMain) {
+  List<int> keys = List<int>();
+
+  void addNewList(CheckListMain checkListMain){
     mainBox.add(checkListMain);
   }
 
@@ -55,6 +52,9 @@ class _HomeState extends State<Home> {
       body: ValueListenableBuilder(
         valueListenable: mainBox.listenable(),
         builder: (context, mainBox, _) {
+
+          keys = mainBox.keys.cast<int>().toList();
+
           return ListView.builder(
             itemCount: mainBox.length,
             shrinkWrap: true,
@@ -66,7 +66,8 @@ class _HomeState extends State<Home> {
                   child: ListTile(
                     onTap: () {
                       Navigator.pushNamed(context, '/details', arguments: {
-                        'title': mainList.title
+                        'checkListMain': mainBox.getAt(index),
+                        'index': keys[index]
                       });
                     },
                     title: Text(mainList.title),
@@ -80,6 +81,7 @@ class _HomeState extends State<Home> {
                         IconButton(
                           onPressed: () {
                             mainBox.deleteAt(index);
+                            keys = mainBox.keys.cast<int>().toList();
                           },
                           icon: Icon(Icons.delete),
                         ),
@@ -115,9 +117,11 @@ class _HomeState extends State<Home> {
                       onPressed: () {
                         final checkListMain = CheckListMain(title: titleCtrl.text, isCompleted: false);
                         addNewList(checkListMain);
+                        keys = mainBox.keys.cast<int>().toList();
                         Navigator.pop(context);
                         Navigator.pushNamed(context, '/details', arguments: {
-                          'title': titleCtrl.text
+                          'checkListMain': checkListMain,
+                          'index': keys[keys.length - 1]
                         });
                         titleCtrl.clear();
                       },
